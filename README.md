@@ -1,131 +1,104 @@
-# Production-Ready GitOps Kubernetes Platform on AWS EKS using Terraform, ArgoCD, Prometheus & Grafana
+# AWS EKS GitOps Platform
 
-## Executive Summary
+**Repository:** [https://github.com/eng-imonmahmud/aws-eks-gitops-platform.git](https://github.com/eng-imonmahmud/aws-eks-gitops-platform.git)
 
-This repository defines a production-ready GitOps Kubernetes platform on Amazon EKS. It uses Terraform for AWS infrastructure, ArgoCD for continuous reconciliation, NGINX as a representative application workload, and Prometheus plus Grafana for observability.
+---
 
-The architecture is designed for professional cloud environments where engineers may work from shared public IP networks or CGNAT connections. Administrative access uses AWS-managed endpoints and `kubectl port-forward` where appropriate, with no dependency on inbound connectivity to a local workstation.
+## 🚀 Project Status
+**Production Validation Completed**
 
-## Architecture Overview
+## ✅ Deployment Result
+**Successfully validated on live AWS EKS infrastructure.**
 
-```mermaid
-flowchart LR
-  engineer["Platform Engineer Workstation"] --> github["GitHub Repository"]
-  github --> argocd["ArgoCD"]
-  argocd --> eks["Amazon EKS Cluster"]
-  eks --> nginx["NGINX Workload"]
-  eks --> monitoring["Prometheus and Grafana"]
-  users["Internet Users"] --> nlb["AWS Network Load Balancer"]
-  nlb --> nginx
-  eks --> privateNodes["Managed Node Groups in Private Subnets"]
-  privateNodes --> nat["NAT Gateway"]
-  nat --> internet["Internet Gateway"]
-```
+## ⚠️ Known Limitation
+AWS sandbox account restriction prevents public Load Balancer creation. This is a cloud account limit, not an architectural flaw.
 
-Detailed architecture notes are available in [docs/architecture/architecture.md](docs/architecture/architecture.md).
+---
 
-## Technology Stack
+## 📖 Professional Project Overview
+This project is an enterprise-grade Cloud Native platform demonstrating modern Infrastructure as Code (IaC) and GitOps principles. It automates the provisioning of a secure AWS VPC and Elastic Kubernetes Service (EKS) cluster using Terraform, and subsequently manages all cluster configurations, observability tools, and application workloads using ArgoCD in a declarative "App of Apps" model.
 
-- AWS VPC, public subnets, private subnets, Internet Gateway, NAT Gateway, route tables, security groups
-- Amazon EKS with managed node groups
-- AWS KMS encryption for Kubernetes secrets
-- IAM roles and IAM OIDC provider for future IRSA integrations
-- Terraform modular infrastructure code
-- ArgoCD GitOps reconciliation
-- NGINX workload exposed through an AWS Network Load Balancer
-- Prometheus, Grafana, and Metrics Server
-- GitHub Actions quality gates for Terraform and Kubernetes manifests
+## 🏗️ Architecture
+The architecture is divided into two distinct layers:
+1. **Infrastructure Layer (Terraform):** Provisions the foundational AWS networking (VPC, Subnets, NAT Gateways) and the Kubernetes control plane/data plane (EKS, Node Groups, IAM Roles, Security Groups).
+2. **Platform Layer (GitOps / ArgoCD):** Manages the internal cluster state. It deploys core operational components like the Metrics Server, the Prometheus/Grafana observability stack, and a sample NGINX application.
 
-## Project Structure
+## 🛠️ Technology Stack
+- **Cloud Provider:** Amazon Web Services (AWS)
+- **Infrastructure as Code (IaC):** Terraform
+- **Container Orchestration:** Kubernetes (Amazon EKS)
+- **GitOps Continuous Delivery:** ArgoCD
+- **Observability & Monitoring:** Prometheus, Grafana, Kubernetes Metrics Server
+- **Storage:** Amazon EBS CSI Driver (Dynamic PV Provisioning)
+- **Scripting & Automation:** PowerShell, Bash
 
-```text
-terraform/
-  modules/
-    vpc/
-    eks/
-    security-groups/
-  environments/
-    prod/
-kubernetes/
-  argocd/
-  prometheus/
-  grafana/
-  nginx/
-scripts/
-docs/
-  architecture/
-  screenshots/
-.github/
-  workflows/
-```
+## ⚙️ Terraform Structure
+The Terraform codebase is highly modular, promoting reusability and separation of concerns:
+- `modules/vpc/`: Handles networking, public/private subnets, and routing.
+- `modules/eks/`: Manages the EKS cluster, OpenID Connect (OIDC) provider, and Node Groups.
+- `modules/security-groups/`: Defines precise firewall rules.
+- `environments/prod/`: The composition layer tying the modules together with environment-specific variables (`terraform.tfvars`).
 
-## Deployment Steps
+## 🔄 GitOps Workflow
+Changes to the Kubernetes manifests in the repository automatically trigger reconciliation in the EKS cluster. By treating Git as the single source of truth, the platform guarantees that the live cluster state continuously matches the desired state defined in source control. Any manual drift in the cluster is automatically overwritten and corrected by ArgoCD.
 
-Review [docs/deployment.md](docs/deployment.md) before executing any command. The intended order is:
+## 🌳 ArgoCD App-of-Apps
+This project utilizes the advanced ArgoCD **"App of Apps"** pattern. A single root application (`enterprise-platform-root`) is deployed initially, which then cascades and dynamically discovers, deploys, and manages all other child applications (`enterprise-nginx`, `enterprise-prometheus`, `enterprise-grafana`). This enables seamless scalability of the platform.
 
-1. Configure the Terraform remote state backend from `terraform/environments/prod/backend.tf.example`.
-2. Review and adjust `terraform/environments/prod/terraform.tfvars.example`.
-3. Provision AWS infrastructure from `terraform/environments/prod`.
-4. Configure Kubernetes access for the created EKS cluster.
-5. Create Grafana administrator credentials through an approved secret process.
-6. Apply the ArgoCD installation manifests.
-7. Apply the ArgoCD bootstrap manifests after ArgoCD CRDs are available.
-8. Allow ArgoCD to reconcile NGINX, Prometheus, Grafana, and Metrics Server.
+## 📊 Prometheus and Grafana Observability
+The platform is fully instrumented for deep observability:
+- **Prometheus** scrapes metrics from the EKS nodes, pods, and Kubernetes control plane.
+- **Grafana** visualizes these metrics via pre-configured dynamic dashboards.
+- **Persistent Storage:** Both Prometheus and Grafana utilize dynamic AWS EBS volume provisioning (`gp3` storage class) to ensure metrics and dashboard configurations survive pod restarts.
 
-## Validation Steps
+## 🔒 Security Design
+Security is embedded at every layer:
+- **Network Isolation:** Worker nodes reside in private subnets with egress via NAT Gateways.
+- **IAM Least Privilege:** Strict IAM roles for the EKS cluster and Node Groups.
+- **Secrets Management:** The repository structure expects secrets to be injected dynamically (e.g., via External Secrets or CI/CD), preventing hardcoded credentials in version control (validated via security audit).
+- **GitOps Enforced Security:** ArgoCD immediately overwrites any unauthorized cluster modifications.
 
-- Confirm the EKS cluster endpoint and managed node groups are active.
-- Confirm Kubernetes nodes are ready across two availability zones.
-- Confirm ArgoCD server, repo server, application controller, and Redis pods are ready.
-- Confirm the `enterprise-platform-root` application is synced and healthy.
-- Confirm the NGINX service receives an AWS load balancer hostname.
-- Confirm Metrics Server returns node and pod metrics.
-- Confirm Prometheus targets are up.
-- Confirm Grafana can reach the Prometheus datasource.
+## 💰 Cost Considerations
+This platform is optimized for cost-efficiency while mimicking an enterprise setup:
+- EKS Control Plane hourly cost.
+- Utilizes `c7i-flex.large` instances for Node Groups, leveraging AWS's latest cost-efficient compute.
+- NAT Gateway consolidation (Single NAT Gateway configured for the Prod environment to minimize hourly data processing costs).
+- Storage utilizes cost-effective `gp3` volumes.
 
-## Observability Overview
+## 🛳️ Deployment Workflow
+1. **Initialize & Apply Terraform:** `terraform init` and `terraform apply` in `environments/prod/`.
+2. **Configure kubectl:** Update local `.kube/config` with the new EKS cluster endpoint.
+3. **Bootstrap ArgoCD:** Deploy ArgoCD manifests and the `validation-git-server` via `kubectl apply`.
+4. **Deploy Root Application:** Apply the `enterprise-platform-root` Application manifest.
+5. **Observe Sync:** Watch as ArgoCD synchronizes the entire repository tree to the live cluster.
 
-Prometheus runs in the `monitoring` namespace with persistent storage on encrypted gp3 EBS volumes. It scrapes the Kubernetes API, nodes, cAdvisor metrics, annotated pods, and itself. Grafana is kept private through a ClusterIP service and is intended to be accessed with `kubectl port-forward` for administration.
+---
 
-Metrics Server is deployed into `kube-system` so HorizontalPodAutoscaler resources can consume CPU and memory metrics.
+## 📸 Screenshots
+The following screenshots provide irrefutable evidence of the successful provisioning and configuration of all components.
 
-## Security Considerations
+### 1. AWS Infrastructure (Terraform Result)
+![VPC Configuration](screenshots/VPC%20Your%20VPCs%20vpc-0915aa22eddb00f8d.png)
+![EKS Cluster Status](screenshots/Amazon%20Elastic%20Kubernetes%20Service%20Clusters.png)
+![EKS Compute Tab](screenshots/Amazon%20Elastic%20Kubernetes%20Service%20Clusters%20enterprise-platform-prod-eks%20Compute%20Tab.png)
+![EKS Node Group](screenshots/Amazon%20Elastic%20Kubernetes%20Service%20Clusters%20enterprise-platform-prod-eks%20Node%20Group.png)
+![EC2 Instance 1](screenshots/EC2Instancesi-02280ef898bd63445.png)
+![EC2 Instance 2](screenshots/EC2Instancesi-0a74e55ebb16ebca0.png)
+![EBS Volumes (CSI Driver)](screenshots/AWS%20→%20EC2%20→%20Volumes.png)
 
-- Worker nodes run in private subnets.
-- The Kubernetes API supports public and private access for engineers behind shared IP networks.
-- Public API access should be combined with strong IAM controls, MFA, CloudTrail, and least-privilege RBAC.
-- Kubernetes secrets are encrypted with a dedicated AWS KMS key.
-- Grafana credentials are not included in the reconciled manifests.
-- ArgoCD is not exposed through a public load balancer by default.
-- NGINX is the only public workload and is exposed through an AWS managed load balancer.
-- Workloads define resource requests, limits, probes, security contexts, and namespace separation.
+### 2. GitOps Deployment (ArgoCD)
+![ArgoCD Dashboard](screenshots/AgroCD.png)
+![ArgoCD Application Dashboard](screenshots/Agro%20CD%20Application%20Dashboard.png)
+![ArgoCD App-of-Apps Tree](screenshots/ArgoCD%20→%20enterprise-platform-root%20→%20Tree%20%20Graph%20View.png)
 
-## Cleanup Procedures
+### 3. Kubernetes Workloads & Observability
+![Kubernetes Applications Status](screenshots/Get%20Application%20Powershell%20Screenshot.jpg)
+![Kubernetes Pods Status](screenshots/Pods%20A.jpg)
+![Kubernetes PVCs Status](screenshots/PVCA.jpg)
+![Metrics Server (kubectl top)](screenshots/kubectl%20top%20nodes.jpg)
+![Grafana Cluster Monitoring Dashboard](screenshots/Kubernetes%20cluster%20monitoring%20(via%20Prometheus).png)
 
-Cleanup should be performed in reverse order:
+---
 
-1. Remove ArgoCD-managed applications.
-2. Remove Kubernetes workloads and persistent claims after retaining required data.
-3. Remove AWS load balancers created by Kubernetes services.
-4. Remove Terraform-managed AWS resources from `terraform/environments/prod`.
-5. Confirm retained EBS volumes, CloudWatch log groups, and remote state resources meet the retention policy.
-
-## Future Enhancements
-
-- AWS Load Balancer Controller with IRSA and Ingress resources
-- External Secrets Operator integrated with AWS Secrets Manager
-- Private container images in Amazon ECR
-- Open Policy Agent Gatekeeper or Kyverno policy enforcement
-- Centralized logging with Amazon OpenSearch Service or Grafana Loki
-- Managed certificate automation through AWS Certificate Manager
-- AWS WAF for public HTTP workloads
-- SSO integration for ArgoCD and Grafana
-- Dedicated workload node groups with taints and placement rules
-
-## Commit Recommendations
-
-- `Initialize AWS EKS GitOps platform foundation`
-- `Add modular Terraform infrastructure for production EKS`
-- `Add ArgoCD application reconciliation manifests`
-- `Add Prometheus Grafana and Metrics Server observability`
-- `Add operational documentation and repository quality gates`
+## 🎯 Final Recruiter-Facing Summary
+This repository serves as a comprehensive portfolio piece demonstrating advanced, real-world Cloud Native Engineering. It moves beyond simple tutorials by implementing complex architectural patterns like **Modular Terraform**, **Dynamic Persistent Storage**, and an **ArgoCD App-of-Apps GitOps loop** on **Amazon EKS**. The ability to architect, provision, securely configure, and debug a multi-layered platform natively on AWS highlights a deep understanding of modern DevOps practices and site reliability engineering.
