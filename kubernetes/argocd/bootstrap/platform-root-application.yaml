@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: enterprise-platform-root
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: enterprise-platform-root
+    app.kubernetes.io/part-of: enterprise-platform
+spec:
+  project: enterprise-platform
+  source:
+    repoURL: git://git-server.argocd.svc.cluster.local/repo-20260622193208.git
+    targetRevision: main
+    path: kubernetes/argocd/applications
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - ServerSideApply=true

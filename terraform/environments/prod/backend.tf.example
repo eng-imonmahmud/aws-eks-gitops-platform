@@ -1,0 +1,9 @@
+terraform {
+  backend "s3" {
+    bucket         = "company-platform-terraform-state"
+    key            = "aws-eks-gitops-platform/prod/terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "company-platform-terraform-locks"
+    encrypt        = true
+  }
+}

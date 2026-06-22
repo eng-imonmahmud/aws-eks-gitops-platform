@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-rbac-cm
+  labels:
+    app.kubernetes.io/name: argocd-rbac-cm
+    app.kubernetes.io/part-of: argocd
+    platform.company.io/part-of: enterprise-platform
+data:
+  policy.default: role:readonly
+  policy.csv: |
+    p, role:platform-admin, applications, *, enterprise-platform/*, allow
+    p, role:platform-admin, clusters, get, *, allow
+    p, role:platform-admin, repositories, get, *, allow
+    p, role:platform-admin, repositories, create, *, allow
+    p, role:platform-admin, repositories, update, *, allow
+    g, platform-engineering, role:platform-admin

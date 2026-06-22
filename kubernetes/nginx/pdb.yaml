@@ -1,0 +1,13 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: enterprise-nginx
+  namespace: platform-applications
+  labels:
+    app.kubernetes.io/name: enterprise-nginx
+    app.kubernetes.io/part-of: enterprise-platform
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: enterprise-nginx

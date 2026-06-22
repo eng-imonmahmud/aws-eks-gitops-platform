@@ -1,0 +1,28 @@
+flowchart LR
+  engineer["Platform Engineer Workstation"] --> github["GitHub Repository"]
+  github --> argocd["ArgoCD"]
+  argocd --> root["Root Application"]
+  root --> apps["Child Applications"]
+  apps --> nginx["NGINX Namespace"]
+  apps --> monitoring["Monitoring Namespace"]
+  monitoring --> prometheus["Prometheus"]
+  monitoring --> grafana["Grafana"]
+  apps --> metrics["Metrics Server"]
+  users["Internet Users"] --> nlb["AWS Network Load Balancer"]
+  nlb --> nginx
+  subgraph aws["AWS eu-central-1"]
+    subgraph vpc["VPC"]
+      subgraph public["Public Subnets"]
+        nlb
+        nat["NAT Gateway"]
+        igw["Internet Gateway"]
+      end
+      subgraph private["Private Subnets"]
+        eks["Amazon EKS"]
+        nodes["Managed Node Groups"]
+      end
+    end
+  end
+  eks --> nodes
+  nodes --> nat
+  nat --> igw

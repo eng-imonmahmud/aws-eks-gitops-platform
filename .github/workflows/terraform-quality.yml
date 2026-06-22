@@ -1,0 +1,31 @@
+name: Infrastructure Quality Gate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  terraform:
+    name: Terraform Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive terraform
+
+      - name: Terraform init without backend
+        working-directory: terraform/environments/prod
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        working-directory: terraform/environments/prod
+        run: terraform validate

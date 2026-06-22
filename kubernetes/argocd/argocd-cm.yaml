@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+    platform.company.io/part-of: enterprise-platform
+data:
+  application.instanceLabelKey: argocd.argoproj.io/instance
+  exec.enabled: "false"
+  timeout.reconciliation: 180s
+  resource.exclusions: |
+    - apiGroups:
+        - ""
+      kinds:
+        - Event
+      clusters:
+        - "*"

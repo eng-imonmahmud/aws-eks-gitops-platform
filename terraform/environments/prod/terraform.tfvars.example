@@ -1,0 +1,37 @@
+aws_region  = "eu-central-1"
+environment = "prod"
+
+platform_name  = "enterprise-platform"
+vpc_cidr_block = "10.40.0.0/16"
+
+public_subnet_cidrs  = ["10.40.0.0/20", "10.40.16.0/20"]
+private_subnet_cidrs = ["10.40.64.0/20", "10.40.80.0/20"]
+
+enable_single_nat_gateway = false
+
+cluster_version = "1.35"
+
+cluster_endpoint_public_access       = true
+cluster_endpoint_private_access      = true
+cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
+
+node_groups = {
+  system = {
+    instance_types = ["t3.medium"]
+    capacity_type  = "ON_DEMAND"
+    desired_size   = 2
+    min_size       = 2
+    max_size       = 4
+    disk_size      = 40
+    ami_type       = "AL2023_x86_64_STANDARD"
+    labels = {
+      workload = "system"
+    }
+    taints = []
+  }
+}
+
+tags = {
+  CostCenter = "platform-engineering"
+  Owner      = "cloud-platform"
+}

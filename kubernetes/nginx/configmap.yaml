@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: enterprise-nginx-content
+  namespace: platform-applications
+  labels:
+    app.kubernetes.io/name: enterprise-nginx
+    app.kubernetes.io/component: web
+    app.kubernetes.io/part-of: enterprise-platform
+data:
+  index.html: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Enterprise GitOps Platform</title>
+      <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f8fafc; color: #111827; }
+        main { max-width: 880px; margin: 12vh auto; padding: 0 24px; }
+        h1 { font-size: 40px; line-height: 1.1; margin-bottom: 16px; }
+        p { font-size: 18px; line-height: 1.6; color: #374151; }
+        .badge { display: inline-block; padding: 8px 12px; border-radius: 6px; background: #dbeafe; color: #1e40af; font-weight: 700; }
+      </style>
+    </head>
+    <body>
+      <main>
+        <span class="badge">AWS EKS GitOps Platform</span>
+        <h1>Enterprise workload delivery through Terraform, ArgoCD, and Kubernetes.</h1>
+        <p>This service is deployed on Amazon EKS and exposed through an AWS managed load balancer. Platform changes are reconciled from Git using declarative Kubernetes manifests.</p>
+      </main>
+    </body>
+    </html>

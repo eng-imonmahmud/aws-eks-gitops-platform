@@ -1,0 +1,23 @@
+name: Kubernetes Manifest Quality Gate
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  yaml:
+    name: YAML Validation
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yamllint
+        run: python -m pip install yamllint
+
+      - name: Validate Kubernetes manifests
+        run: find kubernetes .github -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yamllint

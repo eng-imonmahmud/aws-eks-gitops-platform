@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: enterprise-grafana
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: enterprise-grafana
+    app.kubernetes.io/part-of: enterprise-platform
+  annotations:
+    argocd.argoproj.io/sync-wave: "30"
+spec:
+  project: enterprise-platform
+  source:
+    repoURL: git://git-server.argocd.svc.cluster.local/repo-20260622193208.git
+    targetRevision: main
+    path: kubernetes/grafana
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
