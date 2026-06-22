@@ -1,4 +1,4 @@
-# AWS EKS GitOps Platform
+# Automated GitOps Kubernetes (EKS) Platform with Prometheus & Grafana
 
 [![AWS EKS](https://img.shields.io/badge/AWS-EKS-FF9900?logo=amazonaws&logoColor=white)](https://aws.amazon.com/eks/)
 [![Terraform](https://img.shields.io/badge/Terraform-1.5+-7B42BC?logo=terraform&logoColor=white)](https://www.terraform.io/)
