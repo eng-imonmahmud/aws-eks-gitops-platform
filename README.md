@@ -144,6 +144,34 @@ The following visual evidence confirms the successful live deployment of the pla
 * Migration of Terraform state to a remote AWS S3 backend with DynamoDB locking.
 * Implementation of Ingress Controllers (AWS ALB Ingress) when account permissions allow.
 
+## Project Status
+
+Status: Completed
+
+This project has successfully completed:
+
+* Infrastructure provisioning with Terraform
+* Amazon EKS deployment
+* ArgoCD GitOps implementation
+* Metrics Server deployment
+* Prometheus deployment
+* Grafana deployment
+* Persistent storage validation using EBS CSI Driver
+* End-to-end GitOps synchronization validation
+* Production readiness review
+* Security review
+* GitHub publication
+
+Portfolio Note:
+
+This repository is maintained as a portfolio and learning project demonstrating Infrastructure as Code, Kubernetes platform engineering, GitOps, and observability practices.
+
+Infrastructure Lifecycle:
+
+The live AWS infrastructure used for validation may be destroyed after project completion to avoid unnecessary cloud costs. Repository source code, architecture documentation, screenshots, deployment evidence, and implementation details remain available in GitHub.
+
+![Project Status](https://img.shields.io/badge/Project-Completed-brightgreen)
+
 ## Cleanup Instructions
 To safely tear down the environment and avoid lingering cloud charges:
 1. Delete ArgoCD child applications via the UI to clear their resources.
